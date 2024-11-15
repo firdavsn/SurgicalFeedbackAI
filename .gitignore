@@ -5,6 +5,7 @@
 # Audio file formats
 *.mp3
 *.wav
+!sample_audio_clips/*.wav
 *.npy
 
 # Torch files
