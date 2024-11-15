@@ -16,6 +16,8 @@ wandb/*
 .ipynb_checkpoints/*
 rolling_fragments/*
 tmp/*
+*pycache*
+misc/*
 
 # *api*
 # *token*

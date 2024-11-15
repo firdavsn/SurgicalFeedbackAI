@@ -1,9 +1,23 @@
 from utils import *
 import torch
 from models import ExtractDialogueModel
-from transcribe import whisper_transcribe
+from utils import whisper_transcribe
 from utils import set_openai_key
 torch.cuda.empty_cache()
+
+aux = "'all phrases'"
+# aux = "'dialogue'"
+# aux = "'reduced hallucinations'"
+# aux = "'temporal context'"
+
+case_ids =  [1, 2, 9, 10, 18]   # the original 5
+# case_ids = [1, 2, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 28, 29, 33]    # all identifiable (with anchors)
+
+audio_chunk_size = 180  # seconds
+seed = 42
+min_n_speakers = 2
+max_n_speakers = 2
+cosine_sim_thresh = 0.2
 
 def get_metrics(case_id, aux=None):
     openai_key_path = 'openai_api_key.txt'
@@ -29,7 +43,7 @@ def get_metrics(case_id, aux=None):
         'openai_key_path': openai_key_path, 
         'transcribe_fn': whisper_transcribe,
         'full_audio_path': full_audio_path,
-        'interval': 180,
+        'interval': audio_chunk_size,
         'console_times_path': '../../annotations/console_times/combined_console_times_secs.csv',
         'fb_annot_path': '../../clips_no_wiggle/fbk_cuts_no_wiggle_0_4210.csv',
         'vad_activity_path': vad_activity_path,
@@ -45,10 +59,10 @@ def get_metrics(case_id, aux=None):
         'trainee_anchors_dir': 'results/extract_dialogue/anchors/trainee',
         'rag_embeddings_dir': 'results/extract_dialogue/rag_embeddings/context+phrase',
         'tmp_dir': 'tmp',
-        'seed': 42,
-        'min_n_speakers': 2,
-        'max_n_speakers': 2,
-        'embedding_dist_thresh': 0.8
+        'seed': seed,
+        'min_n_speakers': min_n_speakers,
+        'max_n_speakers': max_n_speakers,
+        'embedding_dist_thresh': 1 - cosine_sim_thresh,
     }
     set_openai_key(openai_key_path)
     print(params_extract_dialogue)
@@ -94,25 +108,7 @@ def main():
                                                  'Accuracy f_anatomic', 'Precision f_anatomic', 'Recall f_anatomic', 'F1 f_anatomic', 'AUROC f_anatomic',
                                                  'Accuracy f_procedural', 'Precision f_procedural', 'Recall f_procedural', 'F1 f_procedural', 'AUROC f_procedural',
                                                  'Accuracy f_technical', 'Precision f_technical', 'Recall f_technical', 'F1 f_technical', 'AUROC f_technical',])
-    aux = "'all phrases'"
-    # the original 5
-    for case_id in [1, 2, 9, 10, 18]:
-    
-    # all identifiable (with anchors)
-    # for case_id in [1, 2, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 28, 29, 33]:
-        
-    # After removing outliers
-    # for case_id in [1, 2, 8, 9, 10, 12, 13, 16, 17, 18, 20, 21, 22, 25, 26, 28, 29, 33]:
-    
-    # dialogue
-    # for case_id in [10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 28, 29, 33]:
-    
-    # reduced hallucinations
-    # for case_id in [18, 19, 20, 21, 22, 23, 25, 26, 28, 29, 33]:
-    
-    # temporal context
-    # for case_id in [1, 2, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 28, 29, 33]: 
-    
+    for case_id in case_ids:
         print(f"Case {case_id}")
         try: 
             metrics = get_metrics(case_id, aux=aux)

@@ -7,7 +7,7 @@ from transformers import logging as transformers_logging
 # transformers_logging.set_verbosity_error()
 # transformers_logging.set_verbosity(logging.CRITICAL)
 
-from train import train_text_model, train_audio_model, train_multimodal_model
+from models.train import train_text_model, train_audio_model, train_multimodal_model
 from utils import (
     load_transcriptions_df,
     remove_cases_from_dfs,
@@ -19,7 +19,7 @@ from utils import (
     split_wavs_df,
     get_transcriptions_df
 )
-from transcribe import whisper_transcribe
+from utils import whisper_transcribe
 
 REMOVE_CASES = []
 
@@ -39,11 +39,14 @@ trainer2cases = {
 
 TEST_CASES = []
 SEED = 42
+IS_UNSEEN_CASES = True
+
+REMOVE_CASES = ([1], [2], [9], [10], [18])                                          # when training for 'unseen_case'
+# REMOVE_CASES = (trainer2cases['A2'], trainer2cases['A3'], trainer2cases['A4'])    # when training for 'unseen_surgeon'
 
 PRETRAINED_MODEL_NAMES = {
     'text': 'bert-base-uncased',
     'audio': 'superb/wav2vec2-base-superb-er'
-    # 'audio': 'facebook/wav2vec2-base-960h',
 }
 
 PATHS = {
@@ -63,16 +66,10 @@ def train(model_type, seed, remove_cases, test_cases, aux=None, use_pretrained_a
     
     # model_type: checkpoint_dir
     checkpoint_dirs = {
-        # 'text': f'results/checkpoints/text/Whiper-BERT remove={remove_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
-        # 'audio': f'results/checkpoints/audio/Wav2Vec2 remove={remove_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
-        # 'multimodal': f'results/checkpoints/multimodal/Whiper-BERT + Wav2Vec2 remove={remove_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
-        
         'text': f'results/checkpoints/text/Whiper-BERT remove={remove_cases_str} test={test_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
         'audio': f'results/checkpoints/audio/Wav2Vec2 remove={remove_cases_str} test={test_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
         'multimodal': f'results/checkpoints/multimodal/Whiper-BERT + Wav2Vec2 {"pretrained" if use_pretrained_audio_text else ""} remove={remove_cases_str} test={test_cases_str} seed={seed}{" aux="+aux if aux is not None else ""}',
     }
-    # if os.path.exists(checkpoint_dirs[model_type]):
-    #     shutil.rmtree(checkpoint_dirs[model_type])
     os.makedirs(checkpoint_dirs[model_type], exist_ok=True)
     
     if model_type == 'text':
@@ -232,19 +229,18 @@ def prepare_transcriptions(verbose=True):
     )
     transcriptions_df.to_csv(PATHS['transcriptions_df'], index=False)
 
-if __name__ == "__main__":
-    # for remove_cases in ([1], [2], [9], [10], [18]):
-    for remove_cases in (trainer2cases['A2'], trainer2cases['A3'], trainer2cases['A4']):
+def main():
+    prepare_audio()
+    prepare_transcriptions()
+    
+    for remove_cases in REMOVE_CASES:
         print("====================================")
         print(f"remove_cases: {remove_cases}")
         torch.cuda.empty_cache()
-        # train('text', SEED, remove_cases, TEST_CASES)
+        train('text', SEED, remove_cases, TEST_CASES)
         train('multimodal', SEED, remove_cases, TEST_CASES)
+        train('audio', SEED, remove_cases, TEST_CASES)
         print("\n\n")
-        
-    # train('text', SEED, remove_cases=[], test_cases=[], aux='test')
-    # train('audio', SEED)
-    # train('multimodal', SEED)
-    # prepare_audio()
-    # prepare_transcriptions()
 
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,11 @@
 import wandb
 from transformers import set_seed, TrainingArguments, Trainer, BertForSequenceClassification, AutoTokenizer, AutoFeatureExtractor, Wav2Vec2ForSequenceClassification
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
-from dataset import TextDataset, AudioDataset, AudioTextDataset
-from CustomTrainer import CustomTrainer
-from models import TextModel, AudioModel, AudioTextFusionModel
+from .dataset import TextDataset, AudioDataset, AudioTextDataset
+from .CustomTrainer import CustomTrainer
+from .TextModel import TextModel
+from .AudioModel import AudioModel
+from .AudioTextFusionModel import AudioTextFusionModel
 
 def compute_metrics(eval_pred):
     labels = eval_pred.label_ids

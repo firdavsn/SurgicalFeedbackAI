@@ -1,8 +1,18 @@
 from utils import *
 import torch
 from models import ExtractDialogueModel
-from transcribe import whisper_transcribe
-from utils import set_openai_key
+
+from utils import (
+    whisper_transcribe,
+    set_openai_key
+)
+
+case_ids = list(range(1, 34))
+audio_chunk_size = 180  # seconds
+seed = 42
+min_n_speakers = 2
+max_n_speakers = 2
+cosine_sim_thresh = 0.2
 
 def init_model(case_id):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -18,7 +28,7 @@ def init_model(case_id):
         'openai_key_path': 'openai_api_key.txt',
         'transcribe_fn': whisper_transcribe,
         'full_audio_path': full_audio_path,
-        'interval': 180,
+        'interval': audio_chunk_size,
         'vad_activity_path': f'../../full_VADs/LFB{case_id}_full_activity.csv',
         'diarizations_save_path': f'results/extract_dialogue/diarizations/LFB{case_id}_full.csv',
         'transcriptions_save_path': f'results/extract_dialogue/transcriptions/LFB{case_id}_full.csv',
@@ -27,10 +37,10 @@ def init_model(case_id):
         'trainer_anchors_dir': f'results/extract_dialogue/anchors/LFB{case_id}/trainer',
         'trainee_anchors_dir': f'results/extract_dialogue/anchors/LFB{case_id}/trainee',
         'tmp_dir': 'tmp',
-        'seed': 42,
-        'min_n_speakers': 2,
-        'max_n_speakers': 2,
-        'embedding_dist_thresh': 0.8
+        'seed': seed,
+        'min_n_speakers': min_n_speakers,
+        'max_n_speakers': max_n_speakers,
+        'embedding_dist_thresh': 1 - cosine_sim_thresh
     }
     openai_key_path = 'openai_api_key.txt'
     set_openai_key(openai_key_path)
@@ -46,7 +56,7 @@ def run_transcription(model: ExtractDialogueModel, load_saved):
     model.full_transcription(load_saved=load_saved)
 
 def main():
-    for case_id in range(30, 34):
+    for case_id in case_ids:
         print(f'Processing case {case_id}')
         print('Initializing model...')
         model = init_model(case_id)

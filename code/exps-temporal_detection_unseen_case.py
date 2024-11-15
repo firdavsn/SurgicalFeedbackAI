@@ -6,9 +6,17 @@ import torch
 import torch.nn as nn
 from transformers import set_seed
 from models import TemporalDetectionModel
-from transcribe import whisper_transcribe
+from utils import whisper_transcribe
 
 torch.cuda.empty_cache()
+
+clf_model_class = 'TextModel'
+# clf_model_class = 'AudioModel'
+# clf_model_class = 'AudioTextFusionModel'
+
+case_ids = [1, 2, 9, 10, 18]
+vad_thresholds = [0, 0.1, 0.3, 0.5]
+from_end_thresholds = [0, 3, 5]
 
 def get_metrics(clf_model_class, clf_model_dir, case_id, vad_threshold, from_end_threshold, aux=None, vad_only=False, F1_weighting='weighted'):
     openai_api_key = None
@@ -64,17 +72,17 @@ def get_metrics(clf_model_class, clf_model_dir, case_id, vad_threshold, from_end
 def main():
     metrics_df = pd.DataFrame(columns=['Case', 'Model Class', 'Model Dir', 'VAD Threshold', 'From End Threshold', 'Accuracy', 'Precision', 'Recall', 'F1', 'ROC AUC'])
     i = 0
-    for case_id in [1, 2, 18, 9, 10]:
-        for vad_threshold in [0, 0.1, 0.3, 0.5]:
-            for from_end_threshold in [0, 3, 5]:
-                clf_model_class = 'TextModel'
-                clf_model_dir = f'results/checkpoints/text/Whiper-BERT remove={case_id} test=None seed=42'
-                
-                # clf_model_class = 'AudioModel'
-                # clf_model_dir = f'results/checkpoints/audio/Wav2Vec2 remove={case_id} test=None seed=42'
-                
-                # clf_model_class = 'AudioTextFusionModel'
-                # clf_model_dir = f'results/checkpoints/multimodal/Whiper-BERT + Wav2Vec2 remove={case_id} test=None seed=42'
+    for case_id in case_ids:
+        for vad_threshold in vad_thresholds:
+            for from_end_threshold in from_end_thresholds:
+                if clf_model_class == 'TextModel':
+                    clf_model_dir = f'results/checkpoints/text/Whiper-BERT remove={case_id} test=None seed=42'
+                elif clf_model_class == 'AudioModel':
+                    clf_model_dir = f'results/checkpoints/audio/Wav2Vec2 remove={case_id} test=None seed=42'
+                elif clf_model_class == 'AudioTextFusionModel':
+                    clf_model_dir = f'results/checkpoints/multimodal/Whiper-BERT + Wav2Vec2 remove={case_id} test=None seed=42'
+                else:
+                    raise ValueError(f"Invalid model class: {clf_model_class}")
                 
                 print("=========================================")
                 print(f"Case ID: {case_id}")

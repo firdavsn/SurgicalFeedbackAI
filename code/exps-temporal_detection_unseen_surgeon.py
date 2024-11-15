@@ -6,9 +6,28 @@ import torch
 import torch.nn as nn
 from transformers import set_seed
 from models import TemporalDetectionModel
-from transcribe import whisper_transcribe
+from utils import whisper_transcribe
 
 torch.cuda.empty_cache()
+
+
+"""
+{'A1': {'fb': 1351, 'no_fb': 1351},
+ 'A2': {'fb': 2079, 'no_fb': 2038},
+ 'A3': {'fb': 508, 'no_fb': 509},
+ 'A4': {'fb': 268, 'no_fb': 268}}
+"""
+
+trainer2cases = {
+    'A1': [1, 2, 6, 7, 21, 22, 33, 35],
+    'A2': [3, 4, 5, 8, 12, 13, 14, 16, 18, 20, 24, 26, 29, 30, 31, 32],
+    'A3': [9, 15, 17, 23, 25],
+    'A4': [10, 19, 34]
+}
+
+vad_threshold = 0
+from_end_threshold = 3
+
 
 def get_metrics(clf_model_class, clf_model_dir, case_id, vad_threshold, from_end_threshold, aux=None, vad_only=False):
     openai_api_key = None
@@ -68,20 +87,6 @@ def get_metrics(clf_model_class, clf_model_dir, case_id, vad_threshold, from_end
     
     return metrics_dict
 
-trainer2cases = {
-    'A1': [1, 2, 6, 7, 21, 22, 33, 35],
-    'A2': [3, 4, 5, 8, 12, 13, 14, 16, 18, 20, 24, 26, 29, 30, 31, 32],
-    'A3': [9, 15, 17, 23, 25],
-    'A4': [10, 19, 34]
-}
-
-"""
-{'A1': {'fb': 1351, 'no_fb': 1351},
- 'A2': {'fb': 2079, 'no_fb': 2038},
- 'A3': {'fb': 508, 'no_fb': 509},
- 'A4': {'fb': 268, 'no_fb': 268}}
-"""
-
 def main():
     # metrics_df = pd.DataFrame(columns=['Case', 'Model Class', 'Model Dir', 'VAD Threshold', 'From End Threshold', 'Metrics Weighting', 'Accuracy', 'Precision', 'Recall', 'F1', 'ROC AUC'])
     metrics_df = pd.read_csv('results/rolling_fragments/metrics/unseen_surgeon.csv')
@@ -89,14 +94,6 @@ def main():
     test_models = ['multimodal']
     
     for trainer_id, case_ids in trainer2cases.items():
-        vad_threshold = 0
-        from_end_threshold = 3
-        
-        if trainer_id == 'A2':
-            case_ids = [3, 4, 5, 8, 11, 12, 13, 14, 16, 18, 20, 24, 26, 28, 29, 30, 31, 32]
-        if trainer_id == 'A3':
-            case_ids = [9, 15, 17, 23, 25, 27]
-        
         remove_cases_str = ",".join([str(x) for x in case_ids]) if case_ids else 'None'
 
         models = {
