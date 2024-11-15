@@ -1,0 +1,21 @@
+# Video file formats
+*.avi
+*.mp4
+
+# Audio file formats
+*.mp3
+*.wav
+*.npy
+
+# Torch files
+*.pt
+
+*venv*/
+results/*
+wandb/*
+.ipynb_checkpoints/*
+rolling_fragments/*
+tmp/*
+
+# *api*
+# *token*
