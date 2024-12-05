@@ -2,7 +2,7 @@
 ---
 #### Firdavs Nasriddinov*, Rafal Kocielnik*, Arushi Gupta, Cherine Yang, Elyssa Wong, Anima Anandkumar, Andrew J. Hung
 
-This official repository holds code for the paper "**Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment**". Our [Paper](link) is accepted at [ML4H 2024](link). We open source all code here under a [permissive MIT license](LICENSE), to encourage reproduction and further research exploration. 
+This official repository holds code for the paper "**Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment**". Our [Paper](https://www.arxiv.org/abs/2412.00760) is accepted at [ML4H 2024](link). We open source all code here under a [permissive MIT license](LICENSE), to encourage reproduction and further research exploration. 
 
 <img width="1366" alt="Framework" src="figures/main_figure.png">
 <hr>
@@ -57,19 +57,27 @@ Evaluation on a dataset of 33 surgeries highlights the framework’s capability 
 
 ### Models
 
-- **ExtractDialogueModel**: This model is responsible for predicting trainee behavior and classifying feedback components. It uses OpenAI's GPT models to analyze dialogue and categorize feedback into various types such as verbal acknowledgment, behavioral change, anatomic, procedural, and technical feedback.
+- **ExtractDialogueModel**: This model is responsible for extracting diaologue from entire surgical recordings and 1) detecting, 2) categorizing, 3) assessing feedback. It uses OpenAI's GPT models to detect and analyze dialogue and categorize feedback into various types such as verbal acknowledgment, behavioral change, anatomic, procedural, and technical feedback.
 
-### Notebooks
+- **AudioModel**: This model detects feedback from short audio clips using the Wav2Vec2 model.
+
+- **TextModel**: This model detects feedback from transcriptions of short audio clips using the BERT model.
+
+- **AudioTextFusionModel**: This model detects feedback from a multimodal fusion of transcription embeddings (via BERT) and audio embeddings (via Wav2Vec2) of short audio clips.
+
+- **TemporalDetectionModel**: This model detects feedback from entire surgical recordings with the ability to use any of the fine-tuned models from AudioModel, TextModel, and AudioTextFusionModel.
+
+### Notebooks and Scripts
 
 - **analysis-analyze_dialogue_metrics.ipynb**: Analyzes dialogue metrics.
 - **analysis-analyze_temporal_metrics.ipynb**: Analyzes temporal metrics.
 - **analysis-confusion_matrices.ipynb**: Generates confusion matrices for model evaluation.
-- **analysis-test_similarity_thresh.ipynb**: Tests similarity thresholds for feedback classification.
+- **analysis-test_similarity_thresh.ipynb**: Tests different cosine similarity thresholds for hallucination removal and speaker identification.
 - **demo-dialogue_from_clip.ipynb**: Demonstrates dialogue extraction from audio clips.
-- **exps-dialogue.py**: Experiments with dialogue classification.
+- **exps-dialogue.py**: Run experiments for dialogue extraction method.
 - **exps-temporal_detection_unseen_case.py**: Experiments with temporal detection on unseen cases.
 - **exps-temporal_detection_unseen_surgeon.py**: Experiments with temporal detection on unseen surgeons.
-- **misc-assign_anchors.ipynb**: Assigns anchors for feedback classification.
+- **misc-assign_anchors.ipynb**: Assigns anchors needed to determine hallucinations and identify speakers against.
 - **misc-example_classify_dialogue.ipynb**: Example notebook for classifying dialogue.
 - **misc-play.ipynb**: Miscellaneous experiments and playbook.
 
@@ -85,8 +93,8 @@ Evaluation on a dataset of 33 surgeries highlights the framework’s capability 
 
 1. Clone the repository:
     ```sh
-    git clone <repository_url>
-    cd <repository_directory>
+    git clone https://github.com/firdavsn/SurgicalFeedbackAI.git
+    cd SurgicalFeedbackAI
     ```
 
 2. Install the required packages:
@@ -95,48 +103,8 @@ Evaluation on a dataset of 33 surgeries highlights the framework’s capability 
     ```
 
 3. Set up your OpenAI API key and Hugging Face token:
-    - Place your OpenAI API key in 
-
-openai_api_key.txt
-
-.
-    - Place your Hugging Face token in 
-
-huggingface_token.txt
-
-.
-
-## Usage
-
-### Running the Models
-
-To run the `ExtractDialogueModel` for predicting trainee behavior, use the following command:
-
-```sh
-python code/models/ExtractDialogueModel.py
-```
-
-### Running the Notebooks
-
-You can explore the various Jupyter notebooks in the 
-
-code
-
- directory to analyze dialogue metrics, test similarity thresholds, and more. For example, to run the `analysis-analyze_dialogue_metrics.ipynb` notebook:
-
-```sh
-jupyter notebook code/analysis-analyze_dialogue_metrics.ipynb
-```
-
-## Contributing
-
-We welcome contributions to this project. Please follow these steps to contribute:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
+    - Place your OpenAI API key in openai_api_key.txt
+    - Place your Hugging Face token in huggingface_token.txt
 
 ## License
 
@@ -144,6 +112,18 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Contact
 
-For any questions or inquiries, please contact [your_email@example.com](mailto:your_email@example.com).
+For any questions or inquiries, please contact [firdavs@caltech.edu](mailto:firdavs@caltech.edu).
 
+## Citation
+```bash
+@misc{nasriddinov2024automatingfeedbackanalysissurgical,
+      title={Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment}, 
+      author={Firdavs Nasriddinov and Rafal Kocielnik and Arushi Gupta and Cherine Yang and Elyssa Wong and Anima Anandkumar and Andrew Hung},
+      year={2024},
+      eprint={2412.00760},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2412.00760}, 
+}
+```bash
 ---
