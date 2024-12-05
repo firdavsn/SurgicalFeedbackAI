@@ -125,5 +125,5 @@ For any questions or inquiries, please contact [firdavs@caltech.edu](mailto:fird
       primaryClass={eess.AS},
       url={https://arxiv.org/abs/2412.00760}, 
 }
-```bash
+```
 ---
