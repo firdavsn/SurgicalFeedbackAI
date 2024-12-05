@@ -106,13 +106,13 @@ Evaluation on a dataset of 33 surgeries highlights the framework’s capability 
     - Place your OpenAI API key in openai_api_key.txt
     - Place your Hugging Face token in huggingface_token.txt
 
-## License
+<!-- ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Contact
 
-For any questions or inquiries, please contact [firdavs@caltech.edu](mailto:firdavs@caltech.edu).
+For any questions or inquiries, please contact [firdavs@caltech.edu](mailto:firdavs@caltech.edu). -->
 
 ## Citation
 ```bash
