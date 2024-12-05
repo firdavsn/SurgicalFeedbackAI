@@ -1,8 +1,8 @@
 # Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment
 ---
-#### Firdavs Nasriddinov*, Rafal Kocielnik*, Arushi Gupta, Cherine Yang, Elyssa Wong, Anima Anandkumar, Andrew J. Hung
+#### **Authors**: Firdavs Nasriddinov*, Rafal Kocielnik*, Arushi Gupta, Cherine Yang, Elyssa Wong, Anima Anandkumar, Andrew J. Hung
 
-This official repository holds code for the paper "**Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment**". Our [Paper](https://www.arxiv.org/abs/2412.00760) is accepted at [ML4H 2024](link). 
+This official repository holds code for the paper "**Automating Feedback Analysis in Surgical Training: Detection, Categorization, and Assessment**". Our [Paper](https://www.arxiv.org/abs/2412.00760) is accepted at [ML4H 2024](https://ahli.cc/ml4h/). We open source all code here under a permissive MIT license, to encourage reproduction and further research exploration. 
 
 <img width="1366" alt="Framework" src="figures/main_figure.png">
 <hr>
